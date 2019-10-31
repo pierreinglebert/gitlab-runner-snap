@@ -1,0 +1,13 @@
+#!/bin/sh
+
+gitlab-runner register \
+  --non-interactive \
+  --url "$(snapctl get url)" \
+  --registration-token "$(snapctl get token)" \
+  --executor "$(snapctl get executor)" \
+  --docker-image "$(snapctl get docker-image)" \
+  --description "$(snapctl get description)" \
+  --tag-list "$(snapctl get tags)" \
+  --run-untagged="true" \
+  --locked="false" \
+  --access-level="not_protected"

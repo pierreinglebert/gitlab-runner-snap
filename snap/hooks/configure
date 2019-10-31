@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+validate_url() {
+    url=$1
+    regex='^http(s)?://*'
+
+    if [[ ! $url =~ $regex ]]; then
+        # Problematic URL, print error and exit
+        echo "Error: URL \"${url}\" needs to start with http:// or https://"
+        exit 1
+    fi
+}
+
+validate_url         $(snapctl get url)
+
+snapctl restart $SNAP_NAME

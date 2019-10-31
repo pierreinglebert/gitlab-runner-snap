@@ -1,0 +1,63 @@
+name: gitlab-runner
+version: '12.5.0'
+base: core18
+summary: An Open-Source Time Series Database
+description: |
+  InfluxDB is an open source time series database with no external dependencies.
+  It's useful for recording metrics, events, and performing analytics.
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
+
+parts:
+  gitlab-runner:
+    plugin: go
+    go-importpath: gitlab.com/gitlab-org/gitlab-runner
+    source: .
+    override-build: |
+      export GOPATH=$(realpath ../go)
+      go version
+      go get gitlab.com/gitlab-org/gitlab-runner
+      (
+        cd $GOPATH/src/gitlab.com/gitlab-org/gitlab-runner/
+        make deps
+      )
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp $GOPATH/bin/gitlab-runner $SNAPCRAFT_PART_INSTALL/bin/
+      snapcraftctl build
+    organize:
+      gitlab-runner/install/bin/*: bin/
+    build-packages:
+      - mercurial
+      - git-core
+      - wget
+      - make
+      - build-essential
+  wrapper-scripts:
+    plugin: dump
+    source: bin
+    after: [gitlab-runner]
+    organize:
+      gitlab-runner-daemon: bin/
+
+plugs:
+  system-files:
+    read: [/etc/gitlab-runner]
+    write: [/etc/gitlab-runner]
+
+apps:
+  gitlab-runner:
+    command: gitlab-runner
+    plugs:
+      - network
+  gitlab-runner-daemon:
+    command: gitlab-runner-daemon
+    daemon: simple
+    restart-condition: always
+    plugs:
+      - network
+      - system-files

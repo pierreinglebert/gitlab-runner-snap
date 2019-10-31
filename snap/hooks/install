@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+# Initialize default options
+snapctl set \
+    url="https://gitlab.com/" \
+    registration-token="" \
+    executor="docker" \
+    docker-image="arm64v8/alpine:3" \
+    description="runner" \
+    tags="arm64,docker"
